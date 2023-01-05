@@ -2,10 +2,10 @@
 #include <stdlib.h>
 
 typedef struct film{
-    char *name;
+    char name[100];
     int year;
-    char *country;
-    char *genre;
+    char country[60];
+    char genre[50];
     float IMDb;
 } film;
 
@@ -15,32 +15,32 @@ typedef struct catalog{
     struct film *prev;
 } catalog;
 
-film *createFilm(char *name, int year, char *country, char *genre, float IMDb){
+film *createFilm(FILE* fin){
     film *card;
     card = (film *)malloc(sizeof(film));
-    card -> name = name;
-//    card -> year = year;
-//    card -> country = country;
-//    card -> genre = genre;
-//    card -> IMDb = IMDb;
+    fgets(card -> name, 100, fin);
+    fscanf(fin, "%d\n", &card -> year);
+    fgets(card -> country, 60, fin);
+    fgets(card -> genre, 50, fin);
+    fscanf(fin, "%f\n", &card -> IMDb);
     return card;
 }
 
-catalog* createCatalog(char *name, int year, char *country, char *genre, float IMDb){
+catalog* createCatalog(FILE* fin){
     catalog *newList;
     newList = (catalog*)malloc(sizeof(catalog));
-    newList -> card = createFilm(name, year, country, genre, IMDb);
+    newList -> card = createFilm(fin);
     newList -> next = newList;
     newList -> prev = newList;
     return newList;
 }
 
-catalog* push(char *name, int year, char *country, char *genre, float IMDb, catalog *newList){
+catalog* push(FILE* fin, catalog *newList){
     catalog *cur, *earlier;
     cur = (catalog*) malloc(sizeof (catalog));
     earlier = newList -> next;
     newList -> next = cur;
-    cur -> card = createFilm(name, year, country, genre, IMDb);
+    cur -> card = createFilm(fin);
     cur -> prev = newList;
     cur -> next = earlier;
     earlier -> prev = cur;
@@ -57,9 +57,18 @@ catalog* pop(catalog *newList){
     return prev;
 }
 
-
-
-void main() {
-
+void printCatalog(catalog *nLst){
+    printf("%s %d\n %s %s %.1f\n", nLst->card->name, nLst->card->year, nLst->card->country, nLst->card->genre, nLst->card->IMDb);
 }
 
+void main() {
+    FILE * fin;
+    fin = fopen("list.txt", "r");
+    catalog *new;
+    new = createCatalog(fin);
+    printCatalog(new);
+    for (int i = 0; i < 29; i++){
+        new = push(fin, new);
+        printCatalog(new);
+    }
+}
