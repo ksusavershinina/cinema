@@ -15,7 +15,7 @@ typedef struct catalog{
     struct film *prev;
 } catalog;
 
-film *createFilm(FILE* fin){
+film *createFilmFromFile(FILE* fin){
     film *card;
     card = (film *)malloc(sizeof(film));
     fgets(card -> name, 100, fin);
@@ -26,22 +26,50 @@ film *createFilm(FILE* fin){
     return card;
 }
 
+film *createAdminFilm(void){
+    film *card;
+    card = (film *)malloc(sizeof(film));
+    printf("Enter film name: ");
+    gets(card -> name);
+    printf("Enter year of release: ");
+    scanf("%d\n", &card -> year);
+    printf("Enter produsing country: ");
+    gets(card -> country);
+    printf("Enter film genre: ");
+    gets(card -> genre);
+    printf("Enter rating of film on IMDb: ");
+    scanf("%f\n", &card -> IMDb);
+    return card;
+}
+
 catalog* createCatalog(FILE* fin){
     catalog *newList;
     newList = (catalog*)malloc(sizeof(catalog));
-    newList -> card = createFilm(fin);
+    newList -> card = createFilmFromFile(fin);
     newList -> next = newList;
     newList -> prev = newList;
     return newList;
 }
 
-catalog* push(FILE* fin, catalog *newList){
+catalog* pushFromFile(FILE* fin, catalog *newList){
     catalog *cur, *earlier;
     cur = (catalog*) malloc(sizeof (catalog));
     earlier = newList -> next;
     newList -> next = cur;
-    cur -> card = createFilm(fin);
+    cur -> card = createFilmFromFile(fin);
     cur -> prev = newList;
+    cur -> next = earlier;
+    earlier -> prev = cur;
+    return cur;
+}
+
+catalog* pushAdminFilm(catalog *nList){
+    catalog *cur, *earlier;
+    cur = (catalog*) malloc(sizeof (catalog));
+    earlier = nList -> next;
+    nList -> next = cur;
+    cur -> card = createAdminFilm();
+    cur -> prev = nList;
     cur -> next = earlier;
     earlier -> prev = cur;
     return cur;
@@ -57,8 +85,12 @@ catalog* pop(catalog *newList){
     return prev;
 }
 
-void printCatalog(catalog *nLst){
-    printf("%s %d\n %s %s %.1f\n", nLst->card->name, nLst->card->year, nLst->card->country, nLst->card->genre, nLst->card->IMDb);
+void printF(film *pFilm){
+    printf("%s", pFilm->name);
+    printf("%d\n", pFilm->year);
+    printf("%s", pFilm->country);
+    printf("%s", pFilm->genre);
+    printf("IMDb rating: %.1f\n", pFilm->IMDb);
 }
 
 void main() {
@@ -66,9 +98,21 @@ void main() {
     fin = fopen("list.txt", "r");
     catalog *new;
     new = createCatalog(fin);
-    printCatalog(new);
+    //printF(new->card);
     for (int i = 0; i < 29; i++){
-        new = push(fin, new);
-        printCatalog(new);
+        new = pushFromFile(fin, new);
+        //printF(new->card); это проверка печает весь список
+    }
+    int is_admin = 1;
+//    if (alise.is_admin == 1){ пока не подкручена твоя структура
+    if (is_admin == 1){
+        int action;
+        printf("If you wanna add new film press 1\n");
+        printf("If you wanna delete film from catalog press 0\n");
+        scanf("%d", &action);
+        if (action == 1){
+            pushAdminFilm(new);
+            printF(new->card);
+        }
     }
 }
