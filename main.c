@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+//структура фильма
 typedef struct film{
     char name[100];
     int year;
@@ -9,12 +11,14 @@ typedef struct film{
     float IMDb;
 } film;
 
+//структура каталога
 typedef struct catalog{
     film *card;
-    struct film *next;
-    struct film *prev;
+    struct catalog *next;
+    struct catalog *prev;
 } catalog;
 
+//инициализация фильма из файла
 film *createFilmFromFile(FILE* fin){
     film *card;
     card = (film *)malloc(sizeof(film));
@@ -25,23 +29,34 @@ film *createFilmFromFile(FILE* fin){
     fscanf(fin, "%f\n", &card -> IMDb);
     return card;
 }
-
+//инициализация фильма из консоли
 film *createAdminFilm(void){
     film *card;
     card = (film *)malloc(sizeof(film));
     printf("Enter film name: ");
-    gets(card -> name);
-    printf("Enter year of release: ");
-    scanf("%d\n", &card -> year);
-    printf("Enter produsing country: ");
-    gets(card -> country);
-    printf("Enter film genre: ");
-    gets(card -> genre);
-    printf("Enter rating of film on IMDb: ");
-    scanf("%f\n", &card -> IMDb);
-    return card;
+    while (getchar() == '\n'){
+      fgets(card -> name, 100, stdin);
+      break;
+    }
+    printf("\nEnter year of release: ");
+    scanf("%d", &card -> year);
+    
+    printf("\nEnter produsing country: ");
+    while (getchar() == '\n'){
+      fgets(card -> country, 60, stdin);
+      break;
+    }
+    printf("\nEnter rating of film: ");
+    scanf("%f", &card -> IMDb);
+    printf("\nEnter film genre: ");
+    while (getchar() == '\n'){
+      fgets(card -> genre, 50, stdin);
+      break;
+    }
+  return card;
 }
 
+//инициализация каталога, головы
 catalog* createCatalog(FILE* fin){
     catalog *newList;
     newList = (catalog*)malloc(sizeof(catalog));
@@ -51,6 +66,7 @@ catalog* createCatalog(FILE* fin){
     return newList;
 }
 
+//пуш из файла
 catalog* pushFromFile(FILE* fin, catalog *newList){
     catalog *cur, *earlier;
     cur = (catalog*) malloc(sizeof (catalog));
@@ -63,6 +79,7 @@ catalog* pushFromFile(FILE* fin, catalog *newList){
     return cur;
 }
 
+//пуш из консоли
 catalog* pushAdminFilm(catalog *nList){
     catalog *cur, *earlier;
     cur = (catalog*) malloc(sizeof (catalog));
@@ -75,6 +92,7 @@ catalog* pushAdminFilm(catalog *nList){
     return cur;
 }
 
+//поп по идеи должна удалятьиз инициализиорванного каталога карточку с фильмом
 catalog* pop(catalog *newList){
     catalog *next, *prev;
     prev = newList -> prev;
@@ -85,34 +103,110 @@ catalog* pop(catalog *newList){
     return prev;
 }
 
-void printF(film *pFilm){
-    printf("%s", pFilm->name);
-    printf("%d\n", pFilm->year);
-    printf("%s", pFilm->country);
-    printf("%s", pFilm->genre);
-    printf("IMDb rating: %.1f\n", pFilm->IMDb);
+//печать в консоль
+void printCurrent(film *pFilm){
+   printf("\033[31m┌───────────────────────────────────────────────────┐\n");
+  printf("│                                                   │ \n");
+  printf("│ %s", pFilm->name);
+  printf("│                                                   │ \n");
+  printf("│ Year: %d                                        │\n", pFilm->year);
+  printf("│                                                   │ \n");
+  printf("│ Country: %s", pFilm->country);
+  printf("│                                                   │ \n");
+  printf("│ Genre: %s", pFilm->genre);
+  printf("│                                                   │ \n");
+  printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
+  printf("│                                                   │ \n");
+  printf("└───────────────────────────────────────────────────┘\n");
 }
 
-void main() {
-    FILE * fin;
-    fin = fopen("list.txt", "r");
-    catalog *new;
-    new = createCatalog(fin);
-    //printF(new->card);
-    for (int i = 0; i < 29; i++){
-        new = pushFromFile(fin, new);
-        //printF(new->card); это проверка печает весь список
-    }
-    int is_admin = 1;
-//    if (alise.is_admin == 1){ пока не подкручена твоя структура
-    if (is_admin == 1){
-        int action;
-        printf("If you wanna add new film press 1\n");
-        printf("If you wanna delete film from catalog press 0\n");
-        scanf("%d", &action);
-        if (action == 1){
-            pushAdminFilm(new);
-            printF(new->card);
-        }
-    }
+void printLeftRight(film *pFilm){
+   printf("\033[34m┌───────────────────────────────────────────────────┐\n");
+  printf("│                                                   │ \n");
+  printf("│ %s", pFilm->name);
+  printf("│                                                   │ \n");
+  printf("│ Year: %d                                        │\n", pFilm->year);
+  printf("│                                                   │ \n");
+  printf("│ Country: %s", pFilm->country);
+  printf("│                                                   │ \n");
+  printf("│ Genre: %s", pFilm->genre);
+  printf("│                                                   │ \n");
+  printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
+  printf("│                                                   │ \n");
+  printf("└───────────────────────────────────────────────────┘\n");
 }
+
+//печать в файл
+void fprintfCard(film *pFilm, FILE *fin){
+  fprintf(fin, "\n%s", pFilm->name);
+  fprintf(fin, "%d\n", pFilm->year);
+  fprintf(fin, "%s", pFilm->country);
+  fprintf(fin, "%s", pFilm->genre);
+  fprintf(fin, "%.1f\n", pFilm->IMDb);
+}
+
+int main() {
+  FILE *fin, *f;
+  fin = fopen("filmList.txt", "a+");
+  catalog *new;
+  new = createCatalog(fin);
+  //printF(new->card);
+  for (int i = 0; i < 29; i++) {
+    new = pushFromFile(fin, new);
+        //printF(new->card); //эта проверка печает весь список
+  }
+// тут что-то типа админ мод, пока не готов
+//     int is_admin = 0;
+// //    if (alise.is_admin == 1){ пока не подкручена твоя структура
+//     while (is_admin == 1) {
+//       char action;
+//       char A[2] = {'A', '\0'};
+//       char D[2] = {'D', '\0'};
+//       char E[2] = {'E', '\0'};
+//       printf("Admin mode\n");
+//       printf("If you wanna add new film press A\n");
+//       printf("If you wanna exit admin mode press E\n");
+//       scanf("%c", &action);
+//       if (action == 'A') {
+//         system("clear");
+//         printf("Adding mode\n");
+//         pushAdminFilm(new);
+//         fprintfCard(new -> next -> card, fin);
+//         printf("If you wanna add new film press A\n");
+//         printf("If you wanna adding mode press E\n");
+//         scanf("%c", &action);
+//         if (action == 'E'){
+//           break;
+//         }
+//         system("clear");
+//       }
+//       else if (action == 'E') {
+//         printf("Goodbye, admin)))");
+//         break;
+//       }
+//     }
+  while (1){
+    char action;
+    printLeftRight(new -> prev -> card);
+    printCurrent(new -> card);
+    printLeftRight(new -> next -> card);
+    printf("To move press a-d\n");
+    printf("To see more information press w\n");
+    printf("To get in admin mode press c\n");
+    printf("To leave press l\n");
+    scanf("%c", &action);
+    if (action == 'a'){
+      new = new -> prev;
+    }
+    if (action == 'd'){
+      new = new -> next;
+    }
+    system("clear");
+    if (action == 'l'){
+      printf("Bye)))");
+      break;
+    }
+  }
+  return 0;
+}
+  
