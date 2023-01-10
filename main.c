@@ -108,13 +108,6 @@ void printCurrent(film *pFilm){
    printf("\033[31m┌───────────────────────────────────────────────────┐\n");
   printf("│                                                   │ \n");
   printf("│ %s", pFilm->name);
-  printf("│                                                   │ \n");
-  printf("│ Year: %d                                        │\n", pFilm->year);
-  printf("│                                                   │ \n");
-  printf("│ Country: %s", pFilm->country);
-  printf("│                                                   │ \n");
-  printf("│ Genre: %s", pFilm->genre);
-  printf("│                                                   │ \n");
   printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
   printf("│                                                   │ \n");
   printf("└───────────────────────────────────────────────────┘\n");
@@ -122,6 +115,15 @@ void printCurrent(film *pFilm){
 
 void printLeftRight(film *pFilm){
    printf("\033[34m┌───────────────────────────────────────────────────┐\n");
+  printf("│                                                   │ \n");
+  printf("│ %s", pFilm->name);
+  printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
+  printf("│                                                   │ \n");
+  printf("└───────────────────────────────────────────────────┘\n");
+}
+
+void printDetailedCurrent(film *pFilm){
+  printf("\033[31m┌───────────────────────────────────────────────────┐\n");
   printf("│                                                   │ \n");
   printf("│ %s", pFilm->name);
   printf("│                                                   │ \n");
@@ -150,12 +152,9 @@ int main() {
   fin = fopen("filmList.txt", "a+");
   catalog *new;
   new = createCatalog(fin);
-  //printF(new->card);
   for (int i = 0; i < 29; i++) {
     new = pushFromFile(fin, new);
-        //printF(new->card); //эта проверка печает весь список
   }
-// тут что-то типа админ мод, пока не готов
 //     int is_admin = 0;
 // //    if (alise.is_admin == 1){ пока не подкручена твоя структура
 //     while (is_admin == 1) {
@@ -190,16 +189,31 @@ int main() {
     printLeftRight(new -> prev -> card);
     printCurrent(new -> card);
     printLeftRight(new -> next -> card);
-    printf("To move press a-d\n");
-    printf("To see more information press w\n");
-    printf("To get in admin mode press c\n");
-    printf("To leave press l\n");
+    printf("If you you wanna see another movies press a-d\n");
+    printf("If you you wanna see more information press w\n");
+    printf("If you you wanna get in admin mode press c\n");
+    printf("If you you wanna leave press l\n");
     scanf("%c", &action);
     if (action == 'a'){
       new = new -> prev;
     }
     if (action == 'd'){
       new = new -> next;
+    }
+    if (action == 'w'){
+      while (1){
+        char actionInfoMode;
+        system("clear");
+        printLeftRight(new -> prev -> card);
+        printDitailedCurrent(new -> card);
+        printLeftRight(new -> next -> card);
+        printf("If you you wanna exit info mode press e\n");
+        scanf("%c", &actionInfoMode);
+        if (actionInfoMode == 'e'){
+          system("clear");
+          break;
+        }
+      }
     }
     system("clear");
     if (action == 'l'){
@@ -209,3 +223,4 @@ int main() {
   }
   return 0;
 }
+  
