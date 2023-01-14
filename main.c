@@ -5,10 +5,10 @@
 //структура фильма
 typedef struct film{
     char name[100];
-    int year;
-    char country[60];
-    char genre[50];
-    float IMDb;
+    char year[5];
+    char country[35];
+    char genre[25];
+    char IMDb[4];
 } film;
 
 //структура каталога
@@ -23,10 +23,12 @@ film *createFilmFromFile(FILE* fin){
     film *card;
     card = (film *)malloc(sizeof(film));
     fgets(card -> name, 100, fin);
-    fscanf(fin, "%d\n", &card -> year);
-    fgets(card -> country, 60, fin);
-    fgets(card -> genre, 50, fin);
-    fscanf(fin, "%f\n", &card -> IMDb);
+    fgets(card -> year, 6, fin);
+    card -> year[4] = '\0';
+    fgets(card -> country, 35, fin);
+    fgets(card -> genre, 25, fin);
+    fgets(card -> IMDb, 5, fin);
+    card -> IMDb[3] = '\0';
     return card;
 }
 //инициализация фильма из консоли
@@ -39,20 +41,27 @@ film *createAdminFilm(void){
       break;
     }
     printf("\nEnter year of release: ");
-    scanf("%d", &card -> year);
-    
+    //while (getchar() == '\n'){
+    fgets(card -> year, 6, stdin);
+    //check_len(card -> year, 5, 1);
+      //break;
+    //}
     printf("\nEnter produsing country: ");
-    while (getchar() == '\n'){
-      fgets(card -> country, 60, stdin);
-      break;
-    }
-    printf("\nEnter rating of film: ");
-    scanf("%f", &card -> IMDb);
+    //while (getchar() == '\n'){
+      fgets(card -> country, 35, stdin);
+      //break;
+    //}
+    printf("\nEnter rate of film: ");
+    //while (getchar() == '\n'){
+    fgets(card -> IMDb, 5, stdin);
+    card -> year[3] = '\0';
+      //break;
+    //}
     printf("\nEnter film genre: ");
-    while (getchar() == '\n'){
-      fgets(card -> genre, 50, stdin);
-      break;
-    }
+    //while (getchar() == '\n'){
+      fgets(card -> genre, 25, stdin);
+      //break;
+    //}
   return card;
 }
 
@@ -105,10 +114,10 @@ catalog* pop(catalog *newList){
 
 //печать в консоль
 void printCurrent(film *pFilm){
-   printf("\033[31m┌───────────────────────────────────────────────────┐\n");
+   printf("\033[35m┌───────────────────────────────────────────────────┐\n");
   printf("│                                                   │ \n");
   printf("│ %s", pFilm->name);
-  printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
+  printf("│ IMDb: %s                                         │\n", pFilm->IMDb);
   printf("│                                                   │ \n");
   printf("└───────────────────────────────────────────────────┘\n");
 }
@@ -117,34 +126,34 @@ void printLeftRight(film *pFilm){
    printf("\033[34m┌───────────────────────────────────────────────────┐\n");
   printf("│                                                   │ \n");
   printf("│ %s", pFilm->name);
-  printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
+  printf("│ IMDb: %s                                         │\n", pFilm->IMDb);
   printf("│                                                   │ \n");
   printf("└───────────────────────────────────────────────────┘\n");
 }
 
-void printDetailedCurrent(film *pFilm){
-  printf("\033[31m┌───────────────────────────────────────────────────┐\n");
+void printDitailedCurrent(film *pFilm){
+  printf("\033[35m┌───────────────────────────────────────────────────┐\n");
   printf("│                                                   │ \n");
   printf("│ %s", pFilm->name);
   printf("│                                                   │ \n");
-  printf("│ Year: %d                                        │\n", pFilm->year);
+  printf("│ Year: %s                                        │\n", pFilm->year);
   printf("│                                                   │ \n");
   printf("│ Country: %s", pFilm->country);
   printf("│                                                   │ \n");
   printf("│ Genre: %s", pFilm->genre);
   printf("│                                                   │ \n");
-  printf("│ IMDb: %.1f                                         │\n", pFilm->IMDb);
+  printf("│ IMDb: %s                                         │\n", pFilm->IMDb);
   printf("│                                                   │ \n");
   printf("└───────────────────────────────────────────────────┘\n");
 }
 
 //печать в файл
-void fprintfCard(film *pFilm, FILE *fin){
+void printfCardInFile(film *pFilm, FILE *fin){
   fprintf(fin, "\n%s", pFilm->name);
-  fprintf(fin, "%d\n", pFilm->year);
+  fprintf(fin, "%s", pFilm->year);
   fprintf(fin, "%s", pFilm->country);
   fprintf(fin, "%s", pFilm->genre);
-  fprintf(fin, "%.1f\n", pFilm->IMDb);
+  fprintf(fin, "%s", pFilm->IMDb);
 }
 
 int main() {
@@ -155,35 +164,7 @@ int main() {
   for (int i = 0; i < 29; i++) {
     new = pushFromFile(fin, new);
   }
-//     int is_admin = 0;
-// //    if (alise.is_admin == 1){ пока не подкручена твоя структура
-//     while (is_admin == 1) {
-//       char action;
-//       char A[2] = {'A', '\0'};
-//       char D[2] = {'D', '\0'};
-//       char E[2] = {'E', '\0'};
-//       printf("Admin mode\n");
-//       printf("If you wanna add new film press A\n");
-//       printf("If you wanna exit admin mode press E\n");
-//       scanf("%c", &action);
-//       if (action == 'A') {
-//         system("clear");
-//         printf("Adding mode\n");
-//         pushAdminFilm(new);
-//         fprintfCard(new -> next -> card, fin);
-//         printf("If you wanna add new film press A\n");
-//         printf("If you wanna adding mode press E\n");
-//         scanf("%c", &action);
-//         if (action == 'E'){
-//           break;
-//         }
-//         system("clear");
-//       }
-//       else if (action == 'E') {
-//         printf("Goodbye, admin)))");
-//         break;
-//       }
-//     }
+//     
   while (1){
     char action;
     printLeftRight(new -> prev -> card);
@@ -207,9 +188,9 @@ int main() {
         printLeftRight(new -> prev -> card);
         printDitailedCurrent(new -> card);
         printLeftRight(new -> next -> card);
-        printf("If you you wanna exit info mode press e\n");
+        printf("If you wanna exit info mode press s\n");
         scanf("%c", &actionInfoMode);
-        if (actionInfoMode == 'e'){
+        if (actionInfoMode == 's'){
           system("clear");
           break;
         }
@@ -223,3 +204,4 @@ int main() {
   }
   return 0;
 }
+  
